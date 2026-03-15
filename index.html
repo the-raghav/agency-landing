@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beaucoup — Global Creative &amp; Technology Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FFF5F0;
+      --cream-dark: #F5EDE6;
+      --black: #000000;
+      --off-black: #111111;
+      --text: #1A1A1A;
+      --text-muted: #777777;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', Helvetica, Arial, sans-serif;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Custom cursor — only shown when hover-capable device is available */
+    @media (hover: hover) and (pointer: fine) {
+      body { cursor: none; }
+      a, button, [role="button"] { cursor: none; }
+    }
+
+    /* ─── Custom Cursor ───────────────────────────────────────────────── */
+    .cursor {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--black);
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-follower {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.4);
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.1s ease;
+      mix-blend-mode: difference;
+    }
+
+    body.dark-section .cursor { background: #fff; }
+    body.dark-section .cursor-follower { border-color: rgba(255,255,255,0.4); }
+
+    /* ─── Navigation ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 3rem;
+      mix-blend-mode: normal;
+      transition: padding 0.4s ease;
+    }
+
+    nav.scrolled { padding: 1.25rem 3rem; }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      cursor: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      cursor: none;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 0.5; }
+
+    .nav-menu-btn {
+      background: none;
+      border: none;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      transition: opacity 0.2s;
+    }
+
+    .nav-menu-btn:hover { opacity: 0.5; }
+
+    .menu-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      line-height: 1;
+      transition: transform 0.3s;
+    }
+
+    /* When page is in dark section, flip nav colors */
+    nav.nav-dark .nav-logo,
+    nav.nav-dark .nav-links a,
+    nav.nav-dark .nav-menu-btn { color: #fff; }
+
+    nav.nav-dark .menu-icon { border-color: #fff; }
+
+    /* ─── Menu Overlay ────────────────────────────────────────────────── */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 900;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 8vw;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .menu-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .menu-overlay nav {
+      position: static;
+      padding: 0;
+      margin-bottom: 3rem;
+    }
+
+    .menu-overlay .nav-logo,
+    .menu-overlay .nav-links a,
+    .menu-overlay .nav-menu-btn { color: #fff; }
+
+    .menu-overlay .menu-icon { border-color: #fff; }
+
+    .menu-nav-items {
+      list-style: none;
+      overflow: hidden;
+    }
+
+    .menu-nav-items li {
+      overflow: hidden;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .menu-nav-items a {
+      display: block;
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-decoration: none;
+      cursor: none;
+      transform: translateY(100%);
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.3s;
+      opacity: 0.4;
+    }
+
+    .menu-nav-items a:hover { opacity: 1; }
+
+    .menu-overlay.open .menu-nav-items a {
+      transform: translateY(0);
+    }
+
+    .menu-nav-items li:nth-child(1) a { transition-delay: 0.05s; }
+    .menu-nav-items li:nth-child(2) a { transition-delay: 0.1s; }
+    .menu-nav-items li:nth-child(3) a { transition-delay: 0.15s; }
+    .menu-nav-items li:nth-child(4) a { transition-delay: 0.2s; }
+
+    .menu-footer {
+      margin-top: 4rem;
+      display: flex;
+      gap: 3rem;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .menu-footer a { color: rgba(255,255,255,0.4); text-decoration: none; cursor: none; transition: color 0.2s; }
+    .menu-footer a:hover { color: #fff; }
+
+    /* ─── Sections ────────────────────────────────────────────────────── */
+    section { position: relative; }
+
+    /* ─── Hero ────────────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 3rem 0;
+      overflow: hidden;
+    }
+
+    .hero-top-label {
+      position: absolute;
+      top: 50%;
+      left: 3rem;
+      transform: translateY(-50%);
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      margin-top: 20vh;
+    }
+
+    .hero-heading {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      max-width: 900px;
+      margin-bottom: 3rem;
+      overflow: hidden;
+    }
+
+    .hero-heading em {
+      font-style: italic;
+    }
+
+    .hero-line {
+      display: block;
+      overflow: hidden;
+    }
+
+    .hero-line span {
+      display: block;
+      transform: translateY(110%);
+      transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-line span.visible {
+      transform: translateY(0);
+    }
+
+    .hero-awards {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .hero-award-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .hero-award-item::before {
+      content: '✦';
+      font-size: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Marquee ─────────────────────────────────────────────────────── */
+    .marquee-wrapper {
+      width: 100%;
+      overflow: hidden;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding: 1.2rem 0;
+      background: var(--cream);
+    }
+
+    .marquee-track {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 25s linear infinite;
+    }
+
+    .marquee-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 2rem;
+      padding-right: 2rem;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--text);
+    }
+
+    .marquee-star {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ─── Intro / We Make Section ─────────────────────────────────────── */
+    #intro {
+      background: var(--cream);
+      padding: 10rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .intro-left {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-left em { font-style: italic; }
+
+    .intro-right { padding-left: 2rem; }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--text-muted);
+    }
+
+    .intro-about-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .intro-about-text {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── Works Section ───────────────────────────────────────────────── */
+    #works {
+      background: var(--cream);
+      padding: 8rem 3rem 0;
+    }
+
+    .works-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+    }
+
+    .works-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .works-heading em { font-style: italic; }
+
+    .works-link {
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid var(--text);
+      padding-bottom: 0.2rem;
+      transition: opacity 0.2s;
+    }
+
+    .works-link:hover { opacity: 0.5; }
+
+    /* Project accordion */
+    .projects-list {
+      border-top: 1px solid rgba(0,0,0,0.12);
+    }
+
+    .project-item {
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .project-header {
+      display: grid;
+      grid-template-columns: 4rem 1fr max-content 2.5rem;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem 0;
+      cursor: none;
+      transition: background 0.3s;
+    }
+
+    .project-header:hover { background: rgba(0,0,0,0.015); }
+
+    .project-num {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .project-arrow {
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 50%;
+      font-size: 0.9rem;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .project-item.open .project-arrow {
+      transform: rotate(45deg);
+      background: var(--black);
+      color: #fff;
+      border-color: var(--black);
+    }
+
+    .project-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.8s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s;
+    }
+
+    .project-item.open .project-content {
+      max-height: 600px;
+      padding-bottom: 3rem;
+    }
+
+    .project-image {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--cream-dark);
+      object-fit: cover;
+      overflow: hidden;
+    }
+
+    .project-img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e8ddd6 0%, #d5c8c0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.3);
+    }
+
+    .project-desc {
+      padding-top: 1rem;
+    }
+
+    .project-desc p {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── Dark Portfolio Strip ────────────────────────────────────────── */
+    #portfolio-dark {
+      background: var(--black);
+      color: #fff;
+      padding: 8rem 3rem;
+    }
+
+    .portfolio-dark-label {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .portfolio-dark-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .portfolio-dark-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      max-width: 700px;
+      margin-bottom: 5rem;
+    }
+
+    .portfolio-dark-heading em { font-style: italic; }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .portfolio-card {
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .portfolio-card-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: #1a1a1a;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .portfolio-card-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+    }
+
+    .portfolio-card-info {
+      padding: 1.2rem 0 0;
+    }
+
+    .portfolio-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+
+    .portfolio-card-meta {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ─── Services Intro ──────────────────────────────────────────────── */
+    #services-intro {
+      background: var(--black);
+      color: #fff;
+      padding: 0 3rem 8rem;
+    }
+
+    .services-intro-text {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 300;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      max-width: 900px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 5rem;
+    }
+
+    /* ─── Services Section ────────────────────────────────────────────── */
+    #services {
+      background: var(--cream);
+      padding: 8rem 3rem;
+    }
+
+    .services-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      margin-bottom: 6rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .services-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .services-subheading {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      font-weight: 300;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    .services-desc {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .service-category {
+      padding: 3rem;
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .service-category:last-child { border-right: none; }
+
+    .service-cat-title {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .service-list {
+      list-style: none;
+    }
+
+    .service-list li {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      padding: 0.4rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .service-list li::before {
+      content: '—';
+      font-size: 0.7rem;
+      color: rgba(0,0,0,0.25);
+      flex-shrink: 0;
+    }
+
+    /* Additional services row */
+    .services-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .services-grid-2 .service-category {
+      padding-top: 2rem;
+    }
+
+    /* Third services grid row — no extra top border (grid-2 already has one) */
+    .services-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .services-grid-3 .service-category {
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding-top: 2rem;
+    }
+
+    /* Additional top-margin utility for the services intro paragraph */
+    .intro-about-text--spaced { margin-top: 1.5rem; }
+
+    /* ─── Custom Support ──────────────────────────────────────────────── */
+    #custom-support {
+      background: var(--cream);
+      padding: 6rem 3rem 8rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .custom-left .section-label { margin-bottom: 2rem; }
+
+    .custom-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .custom-heading em { font-style: italic; }
+
+    .custom-right {
+      padding-top: 5rem;
+    }
+
+    .custom-subheading {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+      font-weight: 300;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 2rem;
+    }
+
+    .custom-text {
+      font-size: 0.875rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── Decorative Star Marquee ─────────────────────────────────────── */
+    .star-marquee {
+      overflow: hidden;
+      padding: 2rem 0;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .star-marquee-track {
+      display: flex;
+      animation: marquee 30s linear infinite;
+    }
+
+    .star-marquee-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding-right: 1.5rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .star-marquee-item .star {
+      font-size: 1rem;
+      color: rgba(0,0,0,0.2);
+    }
+
+    /* ─── Contact Section ─────────────────────────────────────────────── */
+    #contact {
+      background: var(--black);
+      color: #fff;
+      padding: 8rem 3rem;
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .contact-top { margin-bottom: 6rem; }
+
+    .contact-label {
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .contact-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .contact-heading {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .contact-heading em { font-style: italic; }
+
+    .contact-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 3rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-decoration: none;
+      cursor: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 0.3rem;
+      transition: border-color 0.2s;
+    }
+
+    .contact-cta:hover { border-color: #fff; }
+
+    .contact-email {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2.5vw, 2rem);
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2rem;
+    }
+
+    .contact-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 2rem;
+    }
+
+    .contact-socials {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .contact-socials a {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      cursor: none;
+      transition: color 0.2s;
+    }
+
+    .contact-socials a:hover { color: #fff; }
+
+    /* ─── Footer ──────────────────────────────────────────────────────── */
+    footer {
+      background: var(--cream);
+      padding: 4rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .footer-nav {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .footer-nav a {
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: none;
+      transition: color 0.2s;
+    }
+
+    .footer-nav a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Contact section overrides footer-copy color to white-tinted */
+    .contact-copy { color: rgba(255,255,255,0.3); }
+
+    /* ─── Scroll Reveal Animations ────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── Horizontal Lines / Decorative ──────────────────────────────── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+      margin: 2rem 0;
+    }
+
+    /* ─── Smooth page loading ─────────────────────────────────────────── */
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .page-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-logo {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      animation: loaderPulse 1.2s ease infinite alternate;
+    }
+
+    @keyframes loaderPulse {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    /* ─── Progress Bar ────────────────────────────────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: var(--black);
+      width: 0%;
+      z-index: 9997;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Hover link underline effect ────────────────────────────────── */
+    .link-underline {
+      position: relative;
+      display: inline-block;
+    }
+
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: width 0.3s ease;
+    }
+
+    .link-underline:hover::after { width: 100%; }
+
+    /* ─── Hover image preview on project row ──────────────────────────── */
+    .preview-image {
+      position: fixed;
+      width: 300px;
+      aspect-ratio: 4/3;
+      pointer-events: none;
+      z-index: 500;
+      opacity: 0;
+      transform: scale(0.9) rotate(-3deg);
+      transition: opacity 0.3s, transform 0.3s;
+      overflow: hidden;
+    }
+
+    .preview-image.visible {
+      opacity: 1;
+      transform: scale(1) rotate(-1deg);
+    }
+
+    .preview-image-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e8ddd6, #d5c8c0);
+    }
+
+    /* ─── Smooth section transitions ─────────────────────────────────── */
+    .section-transition {
+      position: relative;
+    }
+
+    .section-transition::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 100px;
+      background: linear-gradient(to bottom, var(--cream), transparent);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── Responsive ──────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 1.5rem; }
+      .nav-links { display: none; }
+      #hero { padding: 0 1.5rem; }
+      #intro { grid-template-columns: 1fr; padding: 5rem 1.5rem; }
+      .intro-right { padding-left: 0; }
+      #works { padding: 5rem 1.5rem 0; }
+      #portfolio-dark { padding: 5rem 1.5rem; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      #services { padding: 5rem 1.5rem; }
+      .services-header { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .services-grid-2 { grid-template-columns: 1fr; }
+      .service-category { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.1); }
+      #custom-support { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 1.5rem; }
+      .custom-right { padding-top: 0; }
+      #contact { padding: 5rem 1.5rem; }
+      footer { flex-direction: column; gap: 2rem; align-items: flex-start; padding: 3rem 1.5rem; }
+      .project-header { grid-template-columns: 3rem 1fr auto 2rem; gap: 1rem; }
+      .project-content { grid-template-columns: 1fr; }
+      .works-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Page Loader ────────────────────────────────────────────── -->
+  <div class="page-loader" id="pageLoader">
+    <span class="loader-logo">Beaucoup.</span>
+  </div>
+
+  <!-- ─── Progress Bar ──────────────────────────────────────────── -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ─── Custom Cursor ─────────────────────────────────────────── -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursorFollower"></div>
+
+  <!-- ─── Menu Overlay ──────────────────────────────────────────── -->
+  <div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <nav>
+      <a href="#" class="nav-logo" aria-label="Beaucoup home">Beaucoup.</a>
+      <button class="nav-menu-btn" id="menuCloseBtn" aria-label="Close menu">
+        <span class="menu-icon">✕</span>
+      </button>
+    </nav>
+    <ul class="menu-nav-items">
+      <li><a href="#works" class="menu-link">Works</a></li>
+      <li><a href="#services" class="menu-link">Services</a></li>
+      <li><a href="#intro" class="menu-link">Studio</a></li>
+      <li><a href="#contact" class="menu-link">Contact</a></li>
+    </ul>
+    <div class="menu-footer">
+      <a href="#" aria-label="Instagram">Instagram</a>
+      <a href="#" aria-label="LinkedIn">LinkedIn</a>
+      <a href="#" aria-label="Behance">Behance</a>
+      <a href="#" aria-label="Dribbble">Dribbble</a>
+    </div>
+  </div>
+
+  <!-- ─── Navigation ────────────────────────────────────────────── -->
+  <nav id="mainNav" aria-label="Main navigation">
+    <a href="#" class="nav-logo" aria-label="Beaucoup home">Beaucoup.</a>
+    <ul class="nav-links" role="list">
+      <li><a href="#works">Works</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#intro">Studio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-menu-btn" id="menuOpenBtn" aria-label="Open menu" aria-expanded="false">
+      <span class="menu-icon">(+)</span>
+      <span>Menu</span>
+    </button>
+  </nav>
+
+  <!-- ─── Hero Section ──────────────────────────────────────────── -->
+  <section id="hero" aria-label="Hero">
+    <p class="hero-subtitle reveal">Global Creative &amp; Technology Studio</p>
+
+    <h1 class="hero-heading">
+      <span class="hero-line"><span class="visible">Shaping brands</span></span>
+      <span class="hero-line"><span class="visible">&amp; <em>experiences</em></span></span>
+      <span class="hero-line"><span class="visible">people remember</span></span>
+    </h1>
+
+    <div class="hero-awards reveal reveal-delay-2">
+      <div class="hero-award-item">Awwwards — Site of the Day 2023</div>
+      <div class="hero-award-item">Awwwards — Site of the Day 2024</div>
+      <div class="hero-award-item">Awwwards — Developer Award</div>
+      <div class="hero-award-item">Nomination E-commerce of the Year 2024</div>
+      <div class="hero-award-item">Designer of the Year — CSS Design Awards</div>
+    </div>
+
+    <div class="marquee-wrapper">
+      <div class="marquee-track" aria-hidden="true">
+        <span class="marquee-item">Ready to stand out <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Refined, memorable experiences <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Designed to stand out <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Creative &amp; Technology Studio <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Ready to stand out <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Refined, memorable experiences <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Designed to stand out <span class="marquee-star">✦</span></span>
+        <span class="marquee-item">Creative &amp; Technology Studio <span class="marquee-star">✦</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── About / Intro Section ─────────────────────────────────── -->
+  <section id="intro" aria-label="About the studio">
+    <div class="intro-left reveal reveal-left">
+      <p>We make <em>every</em><br>project special</p>
+    </div>
+    <div class="intro-right">
+      <p class="section-label reveal">Beaucoup Studio</p>
+      <h2 class="intro-about-heading reveal reveal-delay-1">
+        We design creative<br>experiences to support<br>our clients' needs
+      </h2>
+      <p class="intro-about-text reveal reveal-delay-2">
+        At Beaucoup Studio, we create your custom website and guarantee interactive experiences. Our
+        mission is pretty straightforward: make every project special and capture users' attention. You can
+        trust our unique savoir-faire and expertise to enhance your company.
+      </p>
+      <p class="intro-about-text reveal reveal-delay-3">
+        We will support you with website set-up and brand guidelines creation, but really, our vocation is to
+        go beyond that. Our team is made of motivated and perfectionistic creatives, ready to turn your vision
+        into something people will remember.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── Works Section ─────────────────────────────────────────── -->
+  <section id="works" aria-label="Our works">
+    <div class="works-header">
+      <h2 class="works-heading reveal">
+        A selection of<br>beautiful <em>stories,</em><br>the memorable ones
+      </h2>
+      <a href="#" class="works-link reveal reveal-delay-2">View all works →</a>
+    </div>
+
+    <div class="projects-list">
+      <div class="project-item" role="article">
+        <div class="project-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="project-num">01</span>
+          <span class="project-title">Maison Lumière</span>
+          <div class="project-tags">
+            <span>Branding</span>
+            <span>Web</span>
+          </div>
+          <span class="project-arrow" aria-hidden="true">+</span>
+        </div>
+        <div class="project-content">
+          <div class="project-image">
+            <div class="project-img-placeholder">Maison Lumière</div>
+          </div>
+          <div class="project-desc">
+            <p class="section-label">Identity &amp; Web</p>
+            <p>A luxury homeware brand redefining elegance through minimalist design. Full identity creation, brand guidelines, and interactive e-commerce experience.</p>
+            <a href="#" class="works-link">View project →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-item" role="article">
+        <div class="project-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="project-num">02</span>
+          <span class="project-title">Atelier Noir</span>
+          <div class="project-tags">
+            <span>Identity</span>
+            <span>Art Direction</span>
+          </div>
+          <span class="project-arrow" aria-hidden="true">+</span>
+        </div>
+        <div class="project-content">
+          <div class="project-image">
+            <div class="project-img-placeholder">Atelier Noir</div>
+          </div>
+          <div class="project-desc">
+            <p class="section-label">Branding &amp; Direction</p>
+            <p>A couture fashion atelier seeking a bold, editorial presence. Complete visual identity, lookbook design, and interactive portfolio website.</p>
+            <a href="#" class="works-link">View project →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-item" role="article">
+        <div class="project-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="project-num">03</span>
+          <span class="project-title">Côté Jardin</span>
+          <div class="project-tags">
+            <span>E-commerce</span>
+            <span>UX/UI</span>
+          </div>
+          <span class="project-arrow" aria-hidden="true">+</span>
+        </div>
+        <div class="project-content">
+          <div class="project-image">
+            <div class="project-img-placeholder">Côté Jardin</div>
+          </div>
+          <div class="project-desc">
+            <p class="section-label">Web Development</p>
+            <p>An artisan garden boutique requiring a delicate, nature-inspired e-commerce platform. Full UX/UI design with custom animations and seamless checkout.</p>
+            <a href="#" class="works-link">View project →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-item" role="article">
+        <div class="project-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="project-num">04</span>
+          <span class="project-title">Studio Reverie</span>
+          <div class="project-tags">
+            <span>Web</span>
+            <span>Motion</span>
+          </div>
+          <span class="project-arrow" aria-hidden="true">+</span>
+        </div>
+        <div class="project-content">
+          <div class="project-image">
+            <div class="project-img-placeholder">Studio Reverie</div>
+          </div>
+          <div class="project-desc">
+            <p class="section-label">Interactive Experience</p>
+            <p>A creative photography studio wanting to showcase their work through an immersive, motion-rich portfolio. Custom transitions and scroll-based storytelling.</p>
+            <a href="#" class="works-link">View project →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Portfolio Dark Section ────────────────────────────────── -->
+  <section id="portfolio-dark" aria-label="Featured work">
+    <p class="portfolio-dark-label reveal">Our Studio Dedicated its Savoir-Faire</p>
+    <p class="portfolio-dark-heading reveal reveal-delay-1">
+      OUR STUDIO DEDICATED ITS SAVOIR-FAIRE AND<br>
+      EXPERTISE TO ENHANCE EVERY PROJECT.<br>
+      DISCOVER SOME OF OUR IDENTITY CREATION,<br>
+      WEBSITES AND <em>INTERACTIVE EXPERIENCES.</em>
+    </p>
+    <div class="portfolio-grid">
+      <div class="portfolio-card reveal reveal-delay-1">
+        <div class="portfolio-card-img">
+          <div class="portfolio-card-placeholder"></div>
+        </div>
+        <div class="portfolio-card-info">
+          <h3 class="portfolio-card-title">La Belle Époque</h3>
+          <p class="portfolio-card-meta">Identity · Branding · 2024</p>
+        </div>
+      </div>
+      <div class="portfolio-card reveal reveal-delay-2">
+        <div class="portfolio-card-img">
+          <div class="portfolio-card-placeholder"></div>
+        </div>
+        <div class="portfolio-card-info">
+          <h3 class="portfolio-card-title">Dune Collective</h3>
+          <p class="portfolio-card-meta">Web · Motion · 2024</p>
+        </div>
+      </div>
+      <div class="portfolio-card reveal reveal-delay-3">
+        <div class="portfolio-card-img">
+          <div class="portfolio-card-placeholder"></div>
+        </div>
+        <div class="portfolio-card-info">
+          <h3 class="portfolio-card-title">Noire Parfums</h3>
+          <p class="portfolio-card-meta">E-commerce · UX/UI · 2023</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Services Intro (still dark) ──────────────────────────── -->
+  <section id="services-intro" aria-label="Services introduction">
+    <p class="services-intro-text reveal">
+      Discover our services
+    </p>
+  </section>
+
+  <!-- ─── Services Section ──────────────────────────────────────── -->
+  <section id="services" aria-label="Our services">
+    <div class="services-header">
+      <div>
+        <p class="section-label reveal">What we do</p>
+        <h2 class="services-heading reveal reveal-delay-1">
+          Multidisciplinary<br><em>web agency</em>
+        </h2>
+      </div>
+      <div>
+        <p class="services-subheading reveal">
+          We offer a wide range of services. Using your specifications, we take care of everything from strategy to delivery.
+        </p>
+        <ul class="service-list reveal reveal-delay-1">
+          <li>Website creation, domain name registration, online uploading</li>
+          <li>Website design management and development</li>
+          <li>Natural referencing (SEO) on Google, Bing, and more</li>
+          <li>Website maintenance and updates</li>
+          <li>Ergonomics to improve user experience</li>
+        </ul>
+        <p class="intro-about-text intro-about-text--spaced reveal reveal-delay-2">
+          All in all, we design a unique strategy adapted to your activity, your budget and your project needs.
+        </p>
+      </div>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-category reveal">
+        <h3 class="service-cat-title">Identity Creation</h3>
+        <ul class="service-list">
+          <li>Visual identity and logo</li>
+          <li>Brand guidelines</li>
+          <li>Branding</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-1">
+        <h3 class="service-cat-title">Art Direction</h3>
+        <ul class="service-list">
+          <li>Mood board</li>
+          <li>Concept</li>
+          <li>Positioning</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-2">
+        <h3 class="service-cat-title">Strategy</h3>
+        <ul class="service-list">
+          <li>Competitive benchmark</li>
+          <li>Needs definition</li>
+          <li>Advise and support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="services-grid-2">
+      <div class="service-category reveal">
+        <h3 class="service-cat-title">Graphic Design</h3>
+        <ul class="service-list">
+          <li>Business card</li>
+          <li>Packaging</li>
+          <li>Print cover</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-1">
+        <h3 class="service-cat-title">Digital Design</h3>
+        <ul class="service-list">
+          <li>UI/UX Design</li>
+          <li>Interaction design</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-2">
+        <h3 class="service-cat-title">Photography Direction</h3>
+        <ul class="service-list">
+          <li>Mood board</li>
+          <li>Concept</li>
+          <li>Advise and support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="services-grid-3">
+      <div class="service-category reveal">
+        <h3 class="service-cat-title">Web Development</h3>
+        <ul class="service-list">
+          <li>Front-end</li>
+          <li>Back-end</li>
+          <li>Motion / Interaction</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-1">
+        <h3 class="service-cat-title">E-commerce</h3>
+        <ul class="service-list">
+          <li>Shopify / WooCommerce</li>
+          <li>Custom checkout</li>
+          <li>Product pages</li>
+        </ul>
+      </div>
+      <div class="service-category reveal reveal-delay-2">
+        <h3 class="service-cat-title">SEO &amp; Analytics</h3>
+        <ul class="service-list">
+          <li>On-page optimization</li>
+          <li>Performance audit</li>
+          <li>Analytics setup</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Star Marquee Divider ───────────────────────────────────── -->
+  <div class="star-marquee" aria-hidden="true">
+    <div class="star-marquee-track">
+      <span class="star-marquee-item"><span class="star">✦</span> Savoir-faire</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Expertise</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Creativity</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Craftsmanship</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Excellence</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Precision</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Passion</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Savoir-faire</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Expertise</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Creativity</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Craftsmanship</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Excellence</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Precision</span>
+      <span class="star-marquee-item"><span class="star">✦</span> Passion</span>
+    </div>
+  </div>
+
+  <!-- ─── Custom Support Section ────────────────────────────────── -->
+  <section id="custom-support" aria-label="Custom support">
+    <div class="custom-left">
+      <p class="section-label reveal">Custom Support</p>
+      <h2 class="custom-heading reveal reveal-delay-1">
+        Unique<br><em>experiences</em><br>designed<br>together
+      </h2>
+    </div>
+    <div class="custom-right">
+      <h3 class="custom-subheading reveal">
+        At Beaucoup Studio, we know how every company is special.
+      </h3>
+      <p class="custom-text reveal reveal-delay-1">
+        Your very own identity will be our main inspiration to create your website. With our custom services,
+        it will look like no other.
+      </p>
+      <p class="custom-text reveal reveal-delay-2">
+        From showcase websites to catalog websites, or even e-commerce, we will create a custom design
+        that suits you perfectly. Specific functionalities, unique modules, colorimetry — no stone is left
+        unturned when it comes to your website's design.
+      </p>
+      <p class="custom-text reveal reveal-delay-3">
+        This website represents your entity, your values, and your personality. It is a living reflection of
+        who you are and what you stand for.
+      </p>
+    </div>
+  </section>
+
+  <!-- ─── Contact Section ───────────────────────────────────────── -->
+  <section id="contact" aria-label="Contact">
+    <div class="contact-top">
+      <p class="contact-label">Get in touch</p>
+      <h2 class="contact-heading reveal">
+        Let's write together<br>a <em>memorable</em><br>story
+      </h2>
+      <a href="mailto:hello@beaucoup.studio" class="contact-cta reveal reveal-delay-2">
+        Start a project →
+      </a>
+      <p class="contact-email reveal reveal-delay-3">hello@beaucoup.studio</p>
+    </div>
+    <div class="contact-bottom">
+      <ul class="contact-socials">
+        <li><a href="#" aria-label="Instagram">Instagram</a></li>
+        <li><a href="#" aria-label="LinkedIn">LinkedIn</a></li>
+        <li><a href="#" aria-label="Behance">Behance</a></li>
+        <li><a href="#" aria-label="Dribbble">Dribbble</a></li>
+      </ul>
+      <span class="footer-copy contact-copy">© 2024 Beaucoup Studio. All rights reserved.</span>
+    </div>
+  </section>
+
+  <!-- ─── Footer ────────────────────────────────────────────────── -->
+  <footer aria-label="Site footer">
+    <span class="footer-logo">Beaucoup.</span>
+    <ul class="footer-nav" role="list">
+      <li><a href="#works">Works</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#intro">Studio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <span class="footer-copy">© 2024 Beaucoup Studio</span>
+  </footer>
+
+  <script>
+    // ─── Page Loader ──────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('pageLoader').classList.add('hidden');
+      }, 800);
+    });
+
+    // ─── Custom Cursor ────────────────────────────────────────────
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursorFollower');
+    let mouseX = 0, mouseY = 0;
+    let followerX = 0, followerY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+
+    function animateCursor() {
+      followerX += (mouseX - followerX) * 0.08;
+      followerY += (mouseY - followerY) * 0.08;
+      follower.style.left = followerX + 'px';
+      follower.style.top = followerY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Cursor expand on hover — use event delegation for performance
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('a, button, [role="button"]')) {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        follower.style.width = '50px';
+        follower.style.height = '50px';
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      if (e.target.closest('a, button, [role="button"]')) {
+        cursor.style.width = '10px';
+        cursor.style.height = '10px';
+        follower.style.width = '36px';
+        follower.style.height = '36px';
+      }
+    });
+
+    // ─── Progress Bar ─────────────────────────────────────────────
+    const progressBar = document.getElementById('progressBar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      progressBar.style.width = progress + '%';
+    });
+
+    // ─── Navigation scroll state ──────────────────────────────────
+    const mainNav = document.getElementById('mainNav');
+    const darkSections = ['portfolio-dark', 'services-intro', 'contact'];
+    let currentNavDark = false;
+
+    window.addEventListener('scroll', () => {
+      // Compact nav
+      if (window.scrollY > 60) {
+        mainNav.classList.add('scrolled');
+      } else {
+        mainNav.classList.remove('scrolled');
+      }
+
+      // Dark/light nav based on section
+      const scrollMid = window.scrollY + 80;
+      let inDark = false;
+
+      darkSections.forEach(id => {
+        const section = document.getElementById(id);
+        if (section) {
+          const top = section.offsetTop;
+          const bottom = top + section.offsetHeight;
+          if (scrollMid >= top && scrollMid < bottom) {
+            inDark = true;
+          }
+        }
+      });
+
+      if (inDark !== currentNavDark) {
+        currentNavDark = inDark;
+        mainNav.classList.toggle('nav-dark', inDark);
+      }
+    });
+
+    // ─── Menu Overlay ─────────────────────────────────────────────
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuOpenBtn = document.getElementById('menuOpenBtn');
+    const menuCloseBtn = document.getElementById('menuCloseBtn');
+
+    menuOpenBtn.addEventListener('click', () => {
+      menuOverlay.classList.add('open');
+      menuOpenBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    });
+
+    menuCloseBtn.addEventListener('click', closeMenu);
+
+    document.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    function closeMenu() {
+      menuOverlay.classList.remove('open');
+      menuOpenBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // ─── Scroll Reveal ────────────────────────────────────────────
+    const revealElements = document.querySelectorAll('.reveal, .reveal-left');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ─── Project Accordion ────────────────────────────────────────
+    document.querySelectorAll('.project-header').forEach(header => {
+      const item = header.parentElement;
+
+      const openItem = () => {
+        const isOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.project-item').forEach(p => {
+          p.classList.remove('open');
+          p.querySelector('[aria-expanded]')?.setAttribute('aria-expanded', 'false');
+        });
+        // Open clicked one if it was closed
+        if (!isOpen) {
+          item.classList.add('open');
+          header.setAttribute('aria-expanded', 'true');
+        }
+      };
+
+      header.addEventListener('click', openItem);
+      header.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openItem();
+        }
+      });
+    });
+
+    // ─── Smooth scroll for anchor links ───────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        const href = anchor.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // ─── Parallax effect on hero heading ─────────────────────────
+    window.addEventListener('scroll', () => {
+      const heroHeading = document.querySelector('.hero-heading');
+      if (heroHeading) {
+        const scrolled = window.scrollY;
+        heroHeading.style.transform = `translateY(${scrolled * 0.12}px)`;
+        heroHeading.style.opacity = 1 - scrolled / 500;
+      }
+    });
+  </script>
+</body>
+</html>
